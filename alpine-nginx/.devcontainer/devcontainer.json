@@ -1,0 +1,41 @@
+{
+	"name": "Alpine-Nginx",
+	"image": "mcr.microsoft.com/devcontainers/base:alpine-3.20",
+	"initializeCommand": {
+		"update": "sudo apk update"
+	},
+	"onCreateCommand": {
+		"install nginx": "sudo apk add nginx openrc",
+		"set folder": "sudo mkdir /www",
+		"add web user": "sudo adduser -D -g 'www' www"
+	},
+	"updateContentCommand": {
+		"backup nginx default config": "sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig",
+		"set index.html": "sudo cp \"$(pwd)\"/.devcontainer/server-setup/index.html /www/index.html",
+		"workspace/web symbolic link": "sudo ln -s \"$(pwd)\" /www",
+		"activate openrc": "sudo openrc"
+	},
+	"postCreateCommand": {
+		"set nginx custom config": "sudo cp \"$(pwd)\"/.devcontainer/server-setup/nginx.conf /etc/nginx/nginx.conf",
+		"change ownership": "sudo chown -R www:www /www /var/lib/nginx",
+		"adding /run/openrc/softlevel": "sudo touch /run/openrc/softlevel",
+		"start nginx": "sudo rc-service nginx start",
+		"upgrate": "sudo apk upgrade"
+	},
+	"postStartCommand": {
+		"nginx status": "sudo rc-service nginx status",
+		"test nginx config": "sudo nginx -t",
+		"show listeners": "sudo netstat -tuln"
+	},
+	"postAttachCommand": {},
+	"forwardPorts": [80],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"esbenp.prettier-vscode",
+				"dbaeumer.vscode-eslint",
+				"bradlc.vscode-tailwindcss"
+			]
+		}
+	}
+}
